@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016.
+ */
+
 package dam.isi.frsf.utn.edu.ar.lab05.modelo;
 
 /**
