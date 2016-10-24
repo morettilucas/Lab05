@@ -1,13 +1,11 @@
 package dam.isi.frsf.utn.edu.ar.lab05;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +14,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDAO;
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDBMetadata;
 
-/**
- * Created by mdominguez on 06/10/16.
- */
-public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.OnCheckedChangeListener {
+public class TareaCursorAdapter extends CursorAdapter{
     private LayoutInflater inflador;
     private ProyectoDAO myDao;
     private Context contexto;
@@ -40,8 +37,7 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
         inflador = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View vista = inflador.inflate(R.layout.fila_tarea, viewGroup, false);
-        return vista;
+        return inflador.inflate(R.layout.fila_tarea, viewGroup, false);
     }
 
     @Override
@@ -57,13 +53,14 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
         TextView responsable = (TextView) view.findViewById(R.id.tareaResponsable);
         CheckBox finalizada = (CheckBox) view.findViewById(R.id.tareaFinalizada);
 
-        final Button btnFinalizar = (Button) view.findViewById(R.id.tareaBtnFinalizada);
-        final Button btnEditar = (Button) view.findViewById(R.id.tareaBtnEditarDatos);
         final ToggleButton btnEstado = (ToggleButton) view.findViewById(R.id.tareaBtnTrabajando);
+        final ImageButton btnEditar = (ImageButton) view.findViewById(R.id.tareaBtnEditarDatos);
+        final ImageButton btnFinalizar = (ImageButton) view.findViewById(R.id.tareaBtnFinalizada);
+        final ImageButton btnBorrar = (ImageButton) view.findViewById(R.id.tareaBtnBorrar);
 
         nombre.setText(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.TAREA)));
-        Integer horasAsigandas = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS));
-        tiempoAsignado.setText(horasAsigandas * 60 + " minutos");
+        Integer horasAsignadas = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS));
+        tiempoAsignado.setText(horasAsignadas * 60 + " minutos");
 
         final Integer minutosTrabajados = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS));
         tiempoTrabajado.setText(minutosTrabajados + " minutos");
@@ -72,12 +69,35 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
         responsable.setText(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaUsuariosMetadata.USUARIO_ALIAS)));
         finalizada.setChecked(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.FINALIZADA)) == 1);
         finalizada.setTextIsSelectable(false);
+        finalizada.setTag(R.integer.key_id,cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
 
         btnEstado.setTag(R.integer.key_id,cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
+        btnEstado.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener(){
 
-        btnEstado.setOnCheckedChangeListener(this);
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                final Integer idTarea = (Integer) buttonView.getTag(R.integer.key_id);
 
-        btnEditar.setTag(cursor.getInt(cursor.getColumnIndex("_id")));
+                if(isChecked){
+                    buttonView.setTag(R.integer.key_marca,System.currentTimeMillis());
+                } else{
+                    final long marcaDeTiempoTmp = (long) buttonView.getTag(R.integer.key_marca);
+                    final long diferencia = System.currentTimeMillis() - marcaDeTiempoTmp;
+                    buttonView.setTag(R.integer.key_marca,0);
+
+                    Thread backGroundUpdate = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            myDao.actualizarTiempoTrabajado(idTarea,diferencia);
+                            handlerRefresh.sendEmptyMessage(1);
+                        }
+                    });
+                    backGroundUpdate.start();
+                }
+            }
+        });
+
+        btnEditar.setTag(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
         btnEditar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +108,7 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
             }
         });
 
-        btnFinalizar.setTag(cursor.getInt(cursor.getColumnIndex("_id")));
+        btnFinalizar.setTag(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
         btnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,29 +125,20 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
                 backGroundUpdate.start();
             }
         });
+
+        btnBorrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context,"todavia no implementado",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    Handler handlerRefresh = new Handler(Looper.getMainLooper()) {
+    private Handler handlerRefresh = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message inputMessage) {
             TareaCursorAdapter.this.changeCursor(myDao.listaTareas(1));
             Log.v("Hndler: ","empty msg");
         }
     };
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        final Integer idTarea = (Integer) buttonView.getTag(R.integer.key_id);
-
-        if(isChecked){
-            buttonView.setTag(R.integer.key_marca,System.currentTimeMillis());
-        } else{
-            final long marcaDeTiempoTmp = (long) buttonView.getTag(R.integer.key_marca);
-            long diferencia = System.currentTimeMillis() - marcaDeTiempoTmp;
-
-            buttonView.setTag(R.integer.key_marca,0l);
-            myDao.actualizarTiempoTrabajado(idTarea,diferencia);
-            handlerRefresh.sendEmptyMessage(2);
-        }
-    }
 }

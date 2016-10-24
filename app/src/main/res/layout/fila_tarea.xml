@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
@@ -28,7 +29,7 @@
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/separador"
-            android:text=" / "
+            android:text="@string/separador"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
@@ -47,22 +48,32 @@
         android:layout_height="wrap_content">
         <ToggleButton
             android:id="@+id/tareaBtnTrabajando"
-            android:textOn="trabajando...."
-            android:textOff="trabajar..."
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/tareaBtnEditarDatos"
-            android:text="Editar"
+            android:textOn="@string/tb_on_trabajando"
+            android:textOff="@string/tb_off_trabajar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
-        <Button
+            android:checked="false" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_menu_edit"
+            android:id="@+id/tareaBtnEditarDatos" />
+
+
+        <ImageButton
             android:id="@+id/tareaBtnFinalizada"
-            android:text="Finalizar!"
+            android:text="@string/btn_finalizar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            app:srcCompat="@android:drawable/ic_menu_save" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_menu_delete"
+            android:id="@+id/tareaBtnBorrar" />
+
     </LinearLayout>
+
 </LinearLayout>
