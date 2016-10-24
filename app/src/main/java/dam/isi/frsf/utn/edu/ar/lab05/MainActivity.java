@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         lvTareas = (ListView) findViewById(R.id.listaTareas);
-
     }
 
     @Override

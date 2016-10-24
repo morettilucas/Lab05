@@ -7,12 +7,14 @@ import android.database.Cursor;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -23,7 +25,7 @@ import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDBMetadata;
 /**
  * Created by mdominguez on 06/10/16.
  */
-public class TareaCursorAdapter extends CursorAdapter {
+public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.OnCheckedChangeListener {
     private LayoutInflater inflador;
     private ProyectoDAO myDao;
     private Context contexto;
@@ -43,33 +45,37 @@ public class TareaCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, final Context context, final Cursor cursor) {
+    public void bindView(final View view, final Context context, final Cursor cursor) {
         //obtener la posicion de la fila actual y asignarla a los botones y checkboxes
         int pos = cursor.getPosition();
 
         // Referencias UI.
         TextView nombre = (TextView) view.findViewById(R.id.tareaTitulo);
         TextView tiempoAsignado = (TextView) view.findViewById(R.id.tareaMinutosAsignados);
-        TextView tiempoTrabajado = (TextView) view.findViewById(R.id.tareaMinutosTrabajados);
+        final TextView tiempoTrabajado = (TextView) view.findViewById(R.id.tareaMinutosTrabajados);
         TextView prioridad = (TextView) view.findViewById(R.id.tareaPrioridad);
         TextView responsable = (TextView) view.findViewById(R.id.tareaResponsable);
         CheckBox finalizada = (CheckBox) view.findViewById(R.id.tareaFinalizada);
 
         final Button btnFinalizar = (Button) view.findViewById(R.id.tareaBtnFinalizada);
         final Button btnEditar = (Button) view.findViewById(R.id.tareaBtnEditarDatos);
-        ToggleButton btnEstado = (ToggleButton) view.findViewById(R.id.tareaBtnTrabajando);
+        final ToggleButton btnEstado = (ToggleButton) view.findViewById(R.id.tareaBtnTrabajando);
 
         nombre.setText(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.TAREA)));
         Integer horasAsigandas = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS));
         tiempoAsignado.setText(horasAsigandas * 60 + " minutos");
 
-        Integer minutosAsigandos = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS));
-        tiempoTrabajado.setText(minutosAsigandos + " minutos");
+        final Integer minutosTrabajados = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS));
+        tiempoTrabajado.setText(minutosTrabajados + " minutos");
         String p = cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaPrioridadMetadata.PRIORIDAD_ALIAS));
         prioridad.setText(p);
         responsable.setText(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaUsuariosMetadata.USUARIO_ALIAS)));
         finalizada.setChecked(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.FINALIZADA)) == 1);
         finalizada.setTextIsSelectable(false);
+
+        btnEstado.setTag(R.integer.key_id,cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
+
+        btnEstado.setOnCheckedChangeListener(this);
 
         btnEditar.setTag(cursor.getInt(cursor.getColumnIndex("_id")));
         btnEditar.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +85,6 @@ public class TareaCursorAdapter extends CursorAdapter {
                 Intent intEditarAct = new Intent(contexto, AltaTareaActivity.class);
                 intEditarAct.putExtra("ID_TAREA", idTarea);
                 context.startActivity(intEditarAct);
-
             }
         });
 
@@ -87,6 +92,8 @@ public class TareaCursorAdapter extends CursorAdapter {
         btnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
                 final Integer idTarea = (Integer) view.getTag();
                 Thread backGroundUpdate = new Thread(new Runnable() {
                     @Override
@@ -105,6 +112,30 @@ public class TareaCursorAdapter extends CursorAdapter {
         @Override
         public void handleMessage(Message inputMessage) {
             TareaCursorAdapter.this.changeCursor(myDao.listaTareas(1));
+            Log.v("Hndler: ","empty msg");
         }
     };
+
+    private String updateTime(String timeWorked){
+        long timeActual = System.currentTimeMillis();
+        return timeWorked;
+
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        final Integer idTarea = (Integer) buttonView.getTag(R.integer.key_id);
+
+        if(isChecked){
+            buttonView.setTag(R.integer.key_marca,System.currentTimeMillis());
+        } else{
+            final long marcaDeTiempoTmp = (long) buttonView.getTag(R.integer.key_marca);
+            long diferencia = System.currentTimeMillis() - marcaDeTiempoTmp;
+
+            Log.v("DIF",""+idTarea+" con "+diferencia);
+            buttonView.setTag(R.integer.key_marca,0l);
+            myDao.actualizarTiempoTrabajado(idTarea,diferencia);
+            handlerRefresh.sendEmptyMessage(2);
+        }
+    }
 }

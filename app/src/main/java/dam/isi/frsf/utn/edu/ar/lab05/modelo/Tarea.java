@@ -7,7 +7,6 @@ public class Tarea {
 
     private String descripcion;
 
-
     private Integer id;
     private Integer horasEstimadas;
     private Integer minutosTrabajados;
@@ -36,7 +35,6 @@ public class Tarea {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public Integer getHorasEstimadas() {
         return horasEstimadas;

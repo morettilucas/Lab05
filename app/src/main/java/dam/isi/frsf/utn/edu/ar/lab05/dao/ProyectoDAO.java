@@ -2,6 +2,7 @@ package dam.isi.frsf.utn.edu.ar.lab05.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -76,7 +77,7 @@ public class ProyectoDAO {
 
     }
 
-    public void actualizarTarea(Tarea t){
+    public void actualizarTarea(Integer idTarea){
 
     }
 
@@ -108,4 +109,25 @@ public class ProyectoDAO {
     }
 
 
+    public void actualizarTiempoTrabajado(Integer idTarea, long diferenciaInMilis) {
+        int diferencia = (int) ((int) diferenciaInMilis/5000l); //5 segundos = 1 minuto
+        Log.v("DIF",""+idTarea+" con "+diferencia);
+
+        SQLiteDatabase mydb =dbHelper.getReadableDatabase();
+        Cursor cursor = mydb.rawQuery("SELECT "+ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS+
+                " FROM "+ProyectoDBMetadata.TABLA_TAREAS+
+                " WHERE "+ProyectoDBMetadata.TablaTareasMetadata._ID+" = "+idTarea.toString(),null);
+
+        cursor.moveToFirst();
+        int minutosTrabajados = cursor.getInt(0);
+        minutosTrabajados += diferencia;
+
+
+        ContentValues valores = new ContentValues();
+        valores.put(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS,minutosTrabajados);
+
+        int cont = mydb.update(ProyectoDBMetadata.TABLA_TAREAS,valores,ProyectoDBMetadata.TablaTareasMetadata._ID+"="+idTarea,null);
+
+        //Log.v("UPDATE",cont+" filas, id: "+idTarea+", con "+diferencia+" minutos");
+    }
 }
