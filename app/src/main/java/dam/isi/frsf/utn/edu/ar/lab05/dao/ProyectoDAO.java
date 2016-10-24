@@ -91,8 +91,45 @@ public class ProyectoDAO {
         return id;
     }
 
-    public void actualizarTarea(Integer idTarea){
+    public Tarea getTareaForEditById(Integer idTarea) {
+        SQLiteDatabase mydb = dbHelper.getReadableDatabase();
+        Cursor cursor = mydb.rawQuery("SELECT "
+                + ProyectoDBMetadata.TablaTareasMetadata.TAREA + ", "
+                + ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS + ", "
+                + ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD + ", "
+                + ProyectoDBMetadata.TablaTareasMetadata.RESPONSABLE +
+                " FROM " + ProyectoDBMetadata.TABLA_TAREAS +
+                " WHERE " + ProyectoDBMetadata.TablaTareasMetadata._ID + " = " + idTarea.toString(), null);
 
+        if (cursor.moveToFirst()) {
+            Tarea t = new Tarea()
+                    .setDescripcion(cursor.getString(0))
+                    .setHorasEstimadas(cursor.getInt(1))
+                    .setPrioridad(new Prioridad().setId(cursor.getInt(2)))
+                    .setResponsable(getUsuarioById(cursor.getInt(3)));
+            return t;
+        }
+        return null;
+    }
+
+    private Usuario getUsuarioById(int idUsuario) {
+        //TODO implementar
+        return new Usuario(1,"Jose","jose@jose.com");
+    }
+
+    public int actualizarTarea(Tarea t){
+        ContentValues nuevoRegistro = new ContentValues(5);
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.TAREA,t.getDescripcion());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS,t.getHorasEstimadas());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD,t.getPrioridad().getId());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.RESPONSABLE,1);
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.PROYECTO,1);
+
+        open(true);
+        int cont = db.update(ProyectoDBMetadata.TABLA_TAREAS,nuevoRegistro,ProyectoDBMetadata.TablaTareasMetadata._ID+"="+t.getId(),null);
+        close();
+
+        return cont;
     }
 
     public void borrarTarea(Tarea t){

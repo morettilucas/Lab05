@@ -93,7 +93,6 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
             @Override
             public void onClick(View view) {
 
-
                 final Integer idTarea = (Integer) view.getTag();
                 Thread backGroundUpdate = new Thread(new Runnable() {
                     @Override

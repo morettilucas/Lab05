@@ -5,9 +5,8 @@ package dam.isi.frsf.utn.edu.ar.lab05.modelo;
  */
 public class Tarea {
 
-    private String descripcion;
-
     private Integer id;
+    private String descripcion;
     private Integer horasEstimadas;
     private Integer minutosTrabajados;
     private Boolean finalizada;

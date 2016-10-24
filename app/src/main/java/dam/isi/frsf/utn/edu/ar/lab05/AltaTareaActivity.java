@@ -28,22 +28,23 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
 
     private ProyectoDAO proyectoDAO;
 
+    private Integer idTarea;
+    private Boolean editarTarea = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alta_tarea);
         inicializarVista();
-        sbPrioridad.setOnSeekBarChangeListener(this); //TODO inicializar tvProgress
+        sbPrioridad.setOnSeekBarChangeListener(this);
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(guardarTarea()!=-1){
-                    Toast.makeText(getApplicationContext(),"La tarea se a creado con éxito!",Toast.LENGTH_SHORT).show();
-                    finish();
-                }else{
-                    Toast.makeText(getApplicationContext(),"Ocurrió un error, no hemos podido guardar la tarea",Toast.LENGTH_SHORT).show();
-                }
+                if(editarTarea)
+                    editarTarea();
+                else
+                    guardarTarea();
             }
         });
 
@@ -55,11 +56,37 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
         });
     }
 
+    private void editarTarea() {
+        Tarea t = new Tarea()
+                .setId(idTarea)
+                .setDescripcion(etDescripcion.getText().toString().trim())
+                .setHorasEstimadas(Integer.valueOf(etHorasEstimadas.getText().toString()))
+                .setPrioridad(new Prioridad(sbPrioridad.getProgress()+1,tvProgress.getText().toString().trim()));
+
+        int cont = proyectoDAO.actualizarTarea(t);
+        if(cont==1){
+            Toast.makeText(getApplicationContext(),"La tarea se a editado con éxito!",Toast.LENGTH_SHORT).show();
+            finish();
+        }else{
+            Toast.makeText(getApplicationContext(),"Ocurrió un error, no hemos podido editar la tarea",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onResume(){
         super.onResume();
         proyectoDAO = new ProyectoDAO(AltaTareaActivity.this);
         proyectoDAO.open();
+
+        idTarea = (int) getIntent().getExtras().get("ID_TAREA");
+        editarTarea = (idTarea!=0);
+
+        if(editarTarea){
+            Tarea t = proyectoDAO.getTareaForEditById(idTarea);
+            etDescripcion.setText(t.getDescripcion());
+            etHorasEstimadas.setText(t.getHorasEstimadas().toString());
+            sbPrioridad.setProgress(t.getPrioridad().getId()-1);
+        }
     }
 
     @Override
@@ -70,7 +97,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
             proyectoDAO.close();
     }
 
-    private long guardarTarea() {
+    private void guardarTarea() {
         Tarea t = new Tarea()
                 .setDescripcion(etDescripcion.getText().toString().trim())
                 .setHorasEstimadas(Integer.valueOf(etHorasEstimadas.getText().toString()))
@@ -78,7 +105,13 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
                 .setMinutosTrabajados(0)
                 .setPrioridad(new Prioridad(sbPrioridad.getProgress()+1,tvProgress.getText().toString().trim()));
 
-        return proyectoDAO.nuevaTarea(t);
+        long result = proyectoDAO.nuevaTarea(t);
+        if(result!=-1){
+            Toast.makeText(getApplicationContext(),"La tarea se a creado con éxito!",Toast.LENGTH_SHORT).show();
+            finish();
+        }else{
+            Toast.makeText(getApplicationContext(),"Ocurrió un error, no hemos podido guardar la tarea",Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void inicializarVista(){
