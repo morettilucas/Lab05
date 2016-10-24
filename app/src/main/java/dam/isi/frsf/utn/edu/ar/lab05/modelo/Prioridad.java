@@ -21,15 +21,17 @@ public class Prioridad {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Prioridad setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public String getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(String prioridad) {
+    public Prioridad setPrioridad(String prioridad) {
         this.prioridad = prioridad;
+        return this;
     }
 }

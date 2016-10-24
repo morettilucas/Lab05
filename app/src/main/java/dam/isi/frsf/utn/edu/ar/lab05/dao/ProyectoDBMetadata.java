@@ -32,7 +32,7 @@ public class ProyectoDBMetadata {
     public static class TablaTareasMetadata implements BaseColumns{
         public static final String TAREA  ="DESCRIPCION";
         public static final String HORAS_PLANIFICADAS ="HORAS_PLANIFICADAS";
-        public static final String MINUTOS_TRABAJADOS ="MINUTOS_TRABAJDOS";
+        public static final String MINUTOS_TRABAJADOS ="MINUTOS_TRABAJADOS";
         public static final String PRIORIDAD="ID_PRIORIDAD";
         public static final String RESPONSABLE ="ID_RESPONSABLE";
         public static final String PROYECTO ="ID_PROYECTO";

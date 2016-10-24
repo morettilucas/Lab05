@@ -32,62 +32,70 @@ public class Tarea {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Tarea setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public Integer getHorasEstimadas() {
         return horasEstimadas;
     }
 
-    public void setHorasEstimadas(Integer horasEstimadas) {
+    public Tarea setHorasEstimadas(Integer horasEstimadas) {
         this.horasEstimadas = horasEstimadas;
+        return this;
     }
 
     public Integer getMinutosTrabajados() {
         return minutosTrabajados;
     }
 
-    public void setMinutosTrabajados(Integer minutosTrabajados) {
+    public Tarea setMinutosTrabajados(Integer minutosTrabajados) {
         this.minutosTrabajados = minutosTrabajados;
+        return this;
     }
 
     public String getDescripcion() {
         return descripcion;
     }
 
-    public void setDescripcion(String descripcion) {
+    public Tarea setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+        return this;
     }
     public Boolean getFinalizada() {
         return finalizada;
     }
 
-    public void setFinalizada(Boolean finalizada) {
+    public Tarea setFinalizada(Boolean finalizada) {
         this.finalizada = finalizada;
+        return this;
     }
 
     public Proyecto getProyecto() {
         return proyecto;
     }
 
-    public void setProyecto(Proyecto proyecto) {
+    public Tarea setProyecto(Proyecto proyecto) {
         this.proyecto = proyecto;
+        return this;
     }
 
     public Prioridad getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(Prioridad prioridad) {
+    public Tarea setPrioridad(Prioridad prioridad) {
         this.prioridad = prioridad;
+        return this;
     }
 
     public Usuario getResponsable() {
         return responsable;
     }
 
-    public void setResponsable(Usuario responsable) {
+    public Tarea setResponsable(Usuario responsable) {
         this.responsable = responsable;
+        return this;
     }
 }

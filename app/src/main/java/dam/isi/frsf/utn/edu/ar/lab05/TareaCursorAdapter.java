@@ -116,12 +116,6 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
         }
     };
 
-    private String updateTime(String timeWorked){
-        long timeActual = System.currentTimeMillis();
-        return timeWorked;
-
-    }
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         final Integer idTarea = (Integer) buttonView.getTag(R.integer.key_id);
@@ -132,7 +126,6 @@ public class TareaCursorAdapter extends CursorAdapter implements CompoundButton.
             final long marcaDeTiempoTmp = (long) buttonView.getTag(R.integer.key_marca);
             long diferencia = System.currentTimeMillis() - marcaDeTiempoTmp;
 
-            Log.v("DIF",""+idTarea+" con "+diferencia);
             buttonView.setTag(R.integer.key_marca,0l);
             myDao.actualizarTiempoTrabajado(idTarea,diferencia);
             handlerRefresh.sendEmptyMessage(2);

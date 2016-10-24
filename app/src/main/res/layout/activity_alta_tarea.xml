@@ -22,14 +22,13 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Descripcion"
-        android:id="@+id/textView2"
+        android:id="@+id/tv_descripcion"
         android:layout_marginEnd="70dp" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
-
+        android:id="@+id/et_descripcion"
         android:lines="3" />
 
     <TextView
@@ -37,26 +36,38 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Horas Estimadas"
-        android:id="@+id/textView3" />
+        android:id="@+id/tv_horas_estimadas" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2" />
+        android:id="@+id/et_horas_estimadas"
+        android:inputType="number"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Prioridad"
-        android:id="@+id/textView4" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Prioridad: "
+            android:id="@+id/tv_prioridad" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Baja"
+            android:id="@+id/tv_progress"/>
+    </LinearLayout>
 
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
-        android:max="4"
-        android:progress="1"
+        android:id="@+id/sb_prioridad"
+        android:max="3"
+        android:progress="0"
         android:indeterminate="false" />
 
     <TextView
@@ -64,12 +75,12 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Responsable"
-        android:id="@+id/textView5" />
+        android:id="@+id/tv_responsable" />
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner" />
+        android:id="@+id/spn_responsable" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -83,6 +94,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancelar"
-        android:id="@+id/btnCanelar" />
+        android:id="@+id/btnCancelar" />
 </LinearLayout>
     </LinearLayout>

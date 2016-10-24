@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.List;
 
 import dam.isi.frsf.utn.edu.ar.lab05.modelo.Prioridad;
+import dam.isi.frsf.utn.edu.ar.lab05.modelo.Proyecto;
 import dam.isi.frsf.utn.edu.ar.lab05.modelo.Tarea;
 import dam.isi.frsf.utn.edu.ar.lab05.modelo.Usuario;
 
@@ -73,8 +75,20 @@ public class ProyectoDAO {
         return cursor;
     }
 
-    public void nuevaTarea(Tarea t){
+    public long nuevaTarea(Tarea t){
+        ContentValues nuevoRegistro = new ContentValues(6);
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.TAREA,t.getDescripcion());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS,t.getHorasEstimadas());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS,t.getMinutosTrabajados());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD,t.getPrioridad().getId());
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.RESPONSABLE,1);
+        nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.PROYECTO,1);
 
+        open(true);
+        long id = db.insert(ProyectoDBMetadata.TABLA_TAREAS,null,nuevoRegistro);
+        close();
+
+        return id;
     }
 
     public void actualizarTarea(Integer idTarea){
@@ -110,8 +124,7 @@ public class ProyectoDAO {
 
 
     public void actualizarTiempoTrabajado(Integer idTarea, long diferenciaInMilis) {
-        int diferencia = (int) ((int) diferenciaInMilis/5000l); //5 segundos = 1 minuto
-        Log.v("DIF",""+idTarea+" con "+diferencia);
+        int diferencia = (int) diferenciaInMilis/5000; //5 segundos = 1 minuto
 
         SQLiteDatabase mydb =dbHelper.getReadableDatabase();
         Cursor cursor = mydb.rawQuery("SELECT "+ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS+
@@ -122,12 +135,9 @@ public class ProyectoDAO {
         int minutosTrabajados = cursor.getInt(0);
         minutosTrabajados += diferencia;
 
-
         ContentValues valores = new ContentValues();
         valores.put(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS,minutosTrabajados);
 
-        int cont = mydb.update(ProyectoDBMetadata.TABLA_TAREAS,valores,ProyectoDBMetadata.TablaTareasMetadata._ID+"="+idTarea,null);
-
-        //Log.v("UPDATE",cont+" filas, id: "+idTarea+", con "+diferencia+" minutos");
+        mydb.update(ProyectoDBMetadata.TABLA_TAREAS,valores,ProyectoDBMetadata.TablaTareasMetadata._ID+"="+idTarea,null);
     }
 }
