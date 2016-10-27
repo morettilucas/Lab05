@@ -21,6 +21,8 @@ import android.widget.ListView;
 
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDAO;
 
+import static android.R.drawable.ic_input_add;
+
 public class MainActivity extends AppCompatActivity {
 
     private ListView lvTareas;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
@@ -8,18 +9,23 @@
     android:lines="2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
+
     <LinearLayout android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:weightSum="1">
         <TextView
             android:id="@+id/tareaResponsable"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/tareaPrioridad"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_gravity="right" />
     </LinearLayout>
+
     <LinearLayout android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -45,7 +51,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:weightSum="1">
         <ToggleButton
             android:id="@+id/tareaBtnTrabajando"
             android:textOn="@string/tb_on_trabajando"
@@ -56,23 +63,30 @@
 
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:srcCompat="@android:drawable/ic_menu_edit"
-            android:id="@+id/tareaBtnEditarDatos" />
+            android:id="@+id/tareaBtnEditarDatos"
+            android:background="?android:attr/windowBackground"
+            android:layout_weight="0.20" />
 
 
         <ImageButton
             android:id="@+id/tareaBtnFinalizada"
             android:text="@string/btn_finalizar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_menu_save" />
+            android:layout_height="match_parent"
+            app:srcCompat="@android:drawable/ic_menu_save"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:background="?android:attr/windowBackground"
+            android:layout_weight="0.20" />
 
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:srcCompat="@android:drawable/ic_menu_delete"
-            android:id="@+id/tareaBtnBorrar" />
+            android:id="@+id/tareaBtnBorrar"
+            android:background="?android:attr/windowBackground"
+            android:layout_weight="0.20" />
 
     </LinearLayout>
 

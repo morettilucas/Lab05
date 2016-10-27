@@ -85,10 +85,10 @@ public class ProyectoDAO {
         nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.PROYECTO,1);
 
         open(true);
-        long id = db.insert(ProyectoDBMetadata.TABLA_TAREAS,null,nuevoRegistro);
+        long idNuevaTarea = db.insert(ProyectoDBMetadata.TABLA_TAREAS,null,nuevoRegistro);
         close();
 
-        return id;
+        return idNuevaTarea;
     }
 
     public Tarea getTareaForEditById(Integer idTarea) {
@@ -126,14 +126,18 @@ public class ProyectoDAO {
         nuevoRegistro.put(ProyectoDBMetadata.TablaTareasMetadata.PROYECTO,1);
 
         open(true);
-        int cont = db.update(ProyectoDBMetadata.TABLA_TAREAS,nuevoRegistro,ProyectoDBMetadata.TablaTareasMetadata._ID+"="+t.getId(),null);
+        int cantFilasUpdated = db.update(ProyectoDBMetadata.TABLA_TAREAS,nuevoRegistro,ProyectoDBMetadata.TablaTareasMetadata._ID+"=?",new String[]{t.getId().toString()});
         close();
 
-        return cont;
+        return cantFilasUpdated;
     }
 
-    public void borrarTarea(Tarea t){
+    public int borrarTarea(Integer idTarea){
+        open(true);
+        int cantFilasEliminadas = db.delete(ProyectoDBMetadata.TABLA_TAREAS,ProyectoDBMetadata.TablaTareasMetadata._ID+"=?", new String[]{idTarea.toString()});
+        close();
 
+        return cantFilasEliminadas;
     }
 
     public List<Prioridad> listarPrioridades(){
@@ -149,7 +153,7 @@ public class ProyectoDAO {
         ContentValues valores = new ContentValues();
         valores.put(ProyectoDBMetadata.TablaTareasMetadata.FINALIZADA,1);
         SQLiteDatabase mydb =dbHelper.getWritableDatabase();
-        mydb.update(ProyectoDBMetadata.TABLA_TAREAS, valores, "_id=?", new String[]{idTarea.toString()});
+        mydb.update(ProyectoDBMetadata.TABLA_TAREAS, valores, ProyectoDBMetadata.TablaTareasMetadata._ID+"=?", new String[]{idTarea.toString()});
     }
 
     public List<Tarea> listarDesviosPlanificacion(Boolean soloTerminadas,Integer desvioMaximoMinutos){
@@ -159,22 +163,21 @@ public class ProyectoDAO {
         return null;
     }
 
-
-    public void actualizarTiempoTrabajado(Integer idTarea, long diferenciaInMilis) {
-        int diferencia = (int) diferenciaInMilis/5000; //5 segundos = 1 minuto
-
+    public void actualizarTiempoTrabajado(Integer idTarea, Integer diferencia) {
         SQLiteDatabase mydb =dbHelper.getReadableDatabase();
         Cursor cursor = mydb.rawQuery("SELECT "+ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS+
                 " FROM "+ProyectoDBMetadata.TABLA_TAREAS+
-                " WHERE "+ProyectoDBMetadata.TablaTareasMetadata._ID+" = "+idTarea.toString(),null);
+                " WHERE "+ProyectoDBMetadata.TablaTareasMetadata._ID+"="+idTarea.toString(),null);
 
         cursor.moveToFirst();
         int minutosTrabajados = cursor.getInt(0);
+        cursor.close();
+
         minutosTrabajados += diferencia;
 
         ContentValues valores = new ContentValues();
         valores.put(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS,minutosTrabajados);
 
-        mydb.update(ProyectoDBMetadata.TABLA_TAREAS,valores,ProyectoDBMetadata.TablaTareasMetadata._ID+"="+idTarea,null);
+        mydb.update(ProyectoDBMetadata.TABLA_TAREAS,valores,ProyectoDBMetadata.TablaTareasMetadata._ID+"=?",new String[]{idTarea.toString()});
     }
 }

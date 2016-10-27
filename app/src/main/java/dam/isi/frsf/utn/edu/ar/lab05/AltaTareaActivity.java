@@ -65,7 +65,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
 
         int cont = proyectoDAO.actualizarTarea(t);
         if(cont==1){
-            Toast.makeText(getApplicationContext(),"La tarea se a editado con éxito!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"La tarea se ha editado con éxito!",Toast.LENGTH_SHORT).show();
             finish();
         }else{
             Toast.makeText(getApplicationContext(),"Ocurrió un error, no hemos podido editar la tarea",Toast.LENGTH_SHORT).show();
@@ -107,7 +107,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
 
         long result = proyectoDAO.nuevaTarea(t);
         if(result!=-1){
-            Toast.makeText(getApplicationContext(),"La tarea se a creado con éxito!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"La tarea se ha creado con éxito!",Toast.LENGTH_SHORT).show();
             finish();
         }else{
             Toast.makeText(getApplicationContext(),"Ocurrió un error, no hemos podido guardar la tarea",Toast.LENGTH_SHORT).show();
