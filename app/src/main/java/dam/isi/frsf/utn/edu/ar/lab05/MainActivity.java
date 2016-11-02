@@ -6,10 +6,8 @@ package dam.isi.frsf.utn.edu.ar.lab05;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,14 +19,14 @@ import android.widget.ListView;
 
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDAO;
 
-import static android.R.drawable.ic_input_add;
-
 public class MainActivity extends AppCompatActivity {
 
     private ListView lvTareas;
     private ProyectoDAO proyectoDAO;
     private Cursor cursor;
     private TareaCursorAdapter tca;
+    private Integer idProyectoActual = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("LAB05-MAIN","en resume");
         proyectoDAO = new ProyectoDAO(MainActivity.this);
         proyectoDAO.open();
-        cursor = proyectoDAO.listaTareas(1);
+        cursor = proyectoDAO.listaTareas(idProyectoActual);
         Log.d("LAB05-MAIN","mediol "+cursor.getCount());
 
         tca = new TareaCursorAdapter(MainActivity.this,cursor,proyectoDAO);
@@ -88,8 +86,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_alta_usuario:
+                return true;
+            case R.id.action_desvios:
+                Intent i = new Intent(this,ConsultasActivity.class);
+                i.putExtra("id_proyecto",idProyectoActual);
+                startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);

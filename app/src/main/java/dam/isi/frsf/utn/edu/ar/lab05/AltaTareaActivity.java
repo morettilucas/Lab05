@@ -1,16 +1,16 @@
 package dam.isi.frsf.utn.edu.ar.lab05;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDAO;
 import dam.isi.frsf.utn.edu.ar.lab05.modelo.Prioridad;
@@ -22,9 +22,11 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
     private EditText etHorasEstimadas;
     private TextView tvProgress;
     private SeekBar sbPrioridad;
-    private Spinner responsable;
+    //private Spinner responsable;
     private Button btnGuardar;
     private Button btnCancelar;
+
+    HashMap<Integer,String> hashMapPrioridades;
 
     private ProyectoDAO proyectoDAO;
 
@@ -77,6 +79,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
         super.onResume();
         proyectoDAO = new ProyectoDAO(AltaTareaActivity.this);
         proyectoDAO.open();
+        obtenerPrioridades();
 
         idTarea = (int) getIntent().getExtras().get("ID_TAREA");
         editarTarea = (idTarea!=0);
@@ -84,7 +87,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
         if(editarTarea){
             Tarea t = proyectoDAO.getTareaForEditById(idTarea);
             etDescripcion.setText(t.getDescripcion());
-            etHorasEstimadas.setText(t.getHorasEstimadas().toString());
+            etHorasEstimadas.setText(t.getHorasEstimadas());
             sbPrioridad.setProgress(t.getPrioridad().getId()-1);
         }
     }
@@ -100,7 +103,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
     private void guardarTarea() {
         Tarea t = new Tarea()
                 .setDescripcion(etDescripcion.getText().toString().trim())
-                .setHorasEstimadas(Integer.valueOf(etHorasEstimadas.getText().toString()))
+                .setHorasEstimadas(Integer.valueOf(etHorasEstimadas.getText().toString().trim()))
                 .setFinalizada(false)
                 .setMinutosTrabajados(0)
                 .setPrioridad(new Prioridad(sbPrioridad.getProgress()+1,tvProgress.getText().toString().trim()));
@@ -123,8 +126,21 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
     }
 
+    private void obtenerPrioridades(){
+        ArrayList<Prioridad> prioridades = proyectoDAO.listarPrioridades();
+        hashMapPrioridades = new HashMap<>();
+        for(Prioridad p: prioridades){
+            hashMapPrioridades.put(p.getId()-1,p.getPrioridad());
+        }
+
+    }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+        tvProgress.setText(hashMapPrioridades.get(progress));
+
+        /*
         switch (progress){
             case 0:
                 tvProgress.setText("Baja");
@@ -139,6 +155,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
                 tvProgress.setText("Urgente");
                 break;
         }
+        */
     }
 
     @Override

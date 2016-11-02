@@ -7,4 +7,9 @@
     <string name="tb_off_trabajar">trabajar...</string>
     <string name="separador">/</string>
     <string name="btn_borrar">Borrar</string>
+    <string name="action_usuario">Usuario</string>
+    <string name="action_desvios">Desvíos</string>
+    <string name="titulo_tarea_con_desvio">Desvíos en la planificación</string>
+    <string name="tareas_con_desvios_btn_buscar">Buscar</string>
+    <string name="chkbox_finalizada">Finalizada</string>
 </resources>

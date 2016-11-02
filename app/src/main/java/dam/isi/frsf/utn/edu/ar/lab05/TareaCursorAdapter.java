@@ -113,7 +113,7 @@ public class TareaCursorAdapter extends CursorAdapter{
                    marcasDeTiempos.put(idTarea,System.currentTimeMillis());
                 } else{
                     final Integer diferencia = (int) (long) ((System.currentTimeMillis() - marcasDeTiempos.get(idTarea)) / 5000);
-                    marcasDeTiempos.put(idTarea,null);
+                    marcasDeTiempos.put(idTarea,0L);
 
                     Thread backGroundUpdate = new Thread(new Runnable() {
                         @Override
