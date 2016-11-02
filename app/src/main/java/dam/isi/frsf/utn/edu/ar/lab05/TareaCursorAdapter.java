@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDAO;
 import dam.isi.frsf.utn.edu.ar.lab05.dao.ProyectoDBMetadata;
+import dam.isi.frsf.utn.edu.ar.lab05.modelo.Proyecto;
 import dam.isi.frsf.utn.edu.ar.lab05.modelo.Tarea;
 
 public class TareaCursorAdapter extends CursorAdapter{
@@ -89,12 +90,12 @@ public class TareaCursorAdapter extends CursorAdapter{
         }
 
         responsable.setText(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaUsuariosMetadata.USUARIO_ALIAS)));
+
         finalizada.setChecked(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.FINALIZADA)) == 1);
-        finalizada.setTextIsSelectable(false);
-        finalizada.setTag(R.integer.key_id,cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
+        finalizada.setTag(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
 
         Integer idTarea = cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID));
-        btnEstado.setTag(R.integer.key_id,idTarea);
+        btnEstado.setTag(idTarea);
         btnEstado.setOnCheckedChangeListener(null);
         if(marcasDeTiempos.get(idTarea)!=null){
             btnEstado.setChecked(marcasDeTiempos.get(idTarea)!=0);
@@ -107,22 +108,28 @@ public class TareaCursorAdapter extends CursorAdapter{
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                final Integer idTarea = (Integer) buttonView.getTag(R.integer.key_id);
+                final Integer idTarea = (Integer) buttonView.getTag();
 
-                if(isChecked){
-                   marcasDeTiempos.put(idTarea,System.currentTimeMillis());
-                } else{
-                    final Integer diferencia = (int) (long) ((System.currentTimeMillis() - marcasDeTiempos.get(idTarea)) / 5000);
-                    marcasDeTiempos.put(idTarea,0L);
+                if(puedeComenzarATrabajar(idTarea)) {
+                    if (isChecked) {
+                        marcasDeTiempos.put(idTarea, System.currentTimeMillis());
+                    } else {
+                        final Integer diferencia = (int) (long) ((System.currentTimeMillis() - marcasDeTiempos.get(idTarea)) / 5000);
+                        marcasDeTiempos.put(idTarea,null);
 
-                    Thread backGroundUpdate = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            myDao.actualizarTiempoTrabajado(idTarea,diferencia);
-                            handlerRefresh.sendEmptyMessage(1);
-                        }
-                    });
-                    backGroundUpdate.start();
+                        Thread backGroundUpdate = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                myDao.actualizarTiempoTrabajado(idTarea, diferencia);
+                                handlerRefresh.sendEmptyMessage(1);
+                            }
+                        });
+                        backGroundUpdate.start();
+                    }
+                }
+                else{
+                    btnEstado.setChecked(false);
+                    Toast.makeText(context,"La tarea se encuentra finalizada",Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -134,7 +141,7 @@ public class TareaCursorAdapter extends CursorAdapter{
                 final Integer idTarea = (Integer) view.getTag();
                 Intent intEditarAct = new Intent(contexto, AltaTareaActivity.class);
                 intEditarAct.putExtra("ID_TAREA", idTarea);
-                context.startActivity(intEditarAct);
+                contexto.startActivity(intEditarAct);
             }
         });
 
@@ -144,34 +151,64 @@ public class TareaCursorAdapter extends CursorAdapter{
             public void onClick(View view) {
 
                 final Integer idTarea = (Integer) view.getTag();
-                Thread backGroundUpdate = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d("LAB05-MAIN", "finalizar tarea : --- " + idTarea);
-                        myDao.finalizar(idTarea);
-                        handlerRefresh.sendEmptyMessage(1);
-                    }
-                });
-                backGroundUpdate.start();
+
+                String msjError = validarFinalizarTarea(idTarea,marcasDeTiempos.get(idTarea)!=null);
+                if(msjError==null) {
+                    Thread backGroundUpdate = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("LAB05-MAIN", "finalizar tarea : --- " + idTarea);
+                            myDao.finalizar(idTarea);
+                            handlerRefresh.sendEmptyMessage(1);
+                        }
+                    });
+                    backGroundUpdate.start();
+                }
+                else{
+                    Toast.makeText(context,msjError,Toast.LENGTH_LONG).show();
+                }
             }
         });
 
-        btnBorrar.setTag(R.integer.key_id,cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
+        btnBorrar.setTag(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)));
         btnBorrar.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                final Integer idTarea = (Integer) v.getTag(R.integer.key_id);
+                final Integer idTarea = (Integer) v.getTag();
 
-                int result = myDao.borrarTarea(idTarea);
-                if(result==1){
-                    Toast.makeText(context,"Tarea eliminada con éxito!",Toast.LENGTH_LONG).show();
-                    handlerRefresh.sendEmptyMessage(1);
-                }else{
-                    Toast.makeText(context,"Ha ocurrido un error, no hemos podido eliminar la tarea",Toast.LENGTH_LONG).show();
+                if(marcasDeTiempos.get(idTarea)==null) {
+                    int result = myDao.borrarTarea(idTarea);
+                    if (result == 1) {
+                        Toast.makeText(context, "Tarea eliminada con éxito!", Toast.LENGTH_LONG).show();
+                        handlerRefresh.sendEmptyMessage(1);
+                    } else {
+                        Toast.makeText(context, "Ha ocurrido un error, no hemos podido eliminar la tarea", Toast.LENGTH_LONG).show();
+                    }
+                }
+                else{
+                    Toast.makeText(context,"No se puede borrar esta tarea, se está trabajando en ella",Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    private boolean puedeComenzarATrabajar(Integer idTarea) {
+        Tarea t = myDao.getTareaForEditById(idTarea);
+        Log.v("INFO_ID",idTarea+"");
+        return !t.getFinalizada();
+    }
+
+    private String validarFinalizarTarea(Integer idTarea, Boolean trabajando) {
+        String msj = null;
+        Tarea t = myDao.getTareaForEditById(idTarea);
+        if(t.getFinalizada()){
+            msj = "La tarea ya ha sido finalizada";
+        }
+        if(trabajando){
+            msj = "No se puede finalizar, se está trabajando en la tarea";
+        }
+        return msj;
     }
 
     private Handler handlerRefresh = new Handler(Looper.getMainLooper()) {

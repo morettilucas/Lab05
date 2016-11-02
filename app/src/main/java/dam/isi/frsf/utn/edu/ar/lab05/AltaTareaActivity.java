@@ -2,6 +2,7 @@ package dam.isi.frsf.utn.edu.ar.lab05;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -87,7 +88,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
         if(editarTarea){
             Tarea t = proyectoDAO.getTareaForEditById(idTarea);
             etDescripcion.setText(t.getDescripcion());
-            etHorasEstimadas.setText(t.getHorasEstimadas());
+            etHorasEstimadas.setText(String.valueOf(t.getHorasEstimadas()));
             sbPrioridad.setProgress(t.getPrioridad().getId()-1);
         }
     }
@@ -137,25 +138,7 @@ public class AltaTareaActivity extends AppCompatActivity implements SeekBar.OnSe
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
         tvProgress.setText(hashMapPrioridades.get(progress));
-
-        /*
-        switch (progress){
-            case 0:
-                tvProgress.setText("Baja");
-                break;
-            case 1:
-                tvProgress.setText("Media");
-                break;
-            case 2:
-                tvProgress.setText("Alta");
-                break;
-            case 3:
-                tvProgress.setText("Urgente");
-                break;
-        }
-        */
     }
 
     @Override

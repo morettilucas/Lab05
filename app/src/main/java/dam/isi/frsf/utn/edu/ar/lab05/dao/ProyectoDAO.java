@@ -39,11 +39,6 @@ public class ProyectoDAO {
             ProyectoDBMetadata.TABLA_TAREAS_ALIAS+"."+ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD+" = "+ProyectoDBMetadata.TABLA_PRIORIDAD_ALIAS+"."+ProyectoDBMetadata.TablaPrioridadMetadata._ID +" AND "+
             ProyectoDBMetadata.TABLA_TAREAS_ALIAS+"."+ProyectoDBMetadata.TablaTareasMetadata.PROYECTO+" = ?";
 
-    private static final String _SQL_TAREAS_CON_DESVIO = "SELECT *" +
-            " FROM "+ProyectoDBMetadata.TABLA_TAREAS +
-            " WHERE ? <= abs("+ ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS+" * 60 - "+ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS+") AND "+
-            ProyectoDBMetadata.TablaTareasMetadata.FINALIZADA+" = ?";
-
     private static final String _SQL_OBTENER_PRIORIDADES = "SELECT "+ProyectoDBMetadata.TablaPrioridadMetadata._ID+
             ", "+ProyectoDBMetadata.TablaPrioridadMetadata.PRIORIDAD+
             " FROM "+ProyectoDBMetadata.TABLA_PRIORIDAD;
@@ -104,21 +99,15 @@ public class ProyectoDAO {
 
     public Tarea getTareaForEditById(Integer idTarea) {
         SQLiteDatabase mydb = dbHelper.getReadableDatabase();
-        Cursor cursor = mydb.rawQuery("SELECT "
-                + ProyectoDBMetadata.TablaTareasMetadata.TAREA + ", "
-                + ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS + ", "
-                + ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD + ", "
-                + ProyectoDBMetadata.TablaTareasMetadata.RESPONSABLE +
-                " FROM " + ProyectoDBMetadata.TABLA_TAREAS +
-                " WHERE " + ProyectoDBMetadata.TablaTareasMetadata._ID + " = " + idTarea.toString(), null);
+        Cursor cursor = mydb.rawQuery("SELECT * FROM " + ProyectoDBMetadata.TABLA_TAREAS +
+                " WHERE " + ProyectoDBMetadata.TablaTareasMetadata._ID + " = " + idTarea, null);
 
         Tarea t = new Tarea();
         if (cursor.moveToFirst()) {
             t
-                    .setId(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata._ID)))
                     .setDescripcion(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.TAREA)))
                     .setHorasEstimadas(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.HORAS_PLANIFICADAS)))
-                    .setPrioridad(new Prioridad().setId(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD))).setPrioridad(cursor.getString(cursor.getColumnIndex(ProyectoDBMetadata.TablaPrioridadMetadata.PRIORIDAD_ALIAS))))
+                    .setPrioridad(new Prioridad().setId(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.PRIORIDAD))))
                     .setResponsable(getUsuarioById(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.RESPONSABLE))))
                     .setFinalizada(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.FINALIZADA))==1)
                     .setMinutosTrabajados(cursor.getInt(cursor.getColumnIndex(ProyectoDBMetadata.TablaTareasMetadata.MINUTOS_TRABAJADOS)));

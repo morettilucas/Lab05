@@ -28,8 +28,6 @@ public class ConsultasActivity extends AppCompatActivity implements View.OnClick
     private Button btnBuscar;
     private TextView tvResultado;
 
-    //private ListView lvTareas;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +56,6 @@ public class ConsultasActivity extends AppCompatActivity implements View.OnClick
         chkBoxFinalizada = (CheckBox) findViewById(R.id.chkbox_finalizada);
         btnBuscar = (Button) findViewById(R.id.btn_buscar);
         tvResultado = (TextView) findViewById(R.id.tv_resultado);
-        //lvTareas = (ListView) findViewById(R.id.lv_tareas);
     }
 
     @Override

@@ -2,20 +2,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="dam.isi.frsf.utn.edu.ar.lab05.MainActivity">
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_alta_usuario"
+        android:icon="@drawable/ic_action_add_user"
+        android:orderInCategory="100"
+        android:title="@string/action_usuario"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_proyectos"
+        android:icon="@drawable/ic_action_proyects"
         android:orderInCategory="100"
         android:title="@string/action_usuario"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_desvios"
         android:orderInCategory="100"
-        android:title="@string/action_desvios"
-        app:showAsAction="ifRoom"  />
+        android:title="@string/action_desvios" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
 
 </menu>
